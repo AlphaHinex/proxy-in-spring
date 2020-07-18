@@ -1,0 +1,59 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven { url 'https://jitpack.io' }
+    }
+    dependencies {
+        classpath 'com.github.alphahinex.spring-roll:roll-dev-configs:0.0.8.RELEASE'
+    }
+}
+
+plugins {
+    id 'org.springframework.boot' version '2.0.9.RELEASE'
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+group = 'io.github.alphahinex'
+version = '0.0.1-SNAPSHOT'
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'groovy'
+
+apply from: this.getClass().getClassLoader().getResource("META-INF/configs/dependencies.gradle")
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = rootProject.group
+version = rootProject.version
+
+dependencies {
+         implementation platform("org.springframework.boot:spring-boot-dependencies:${versions.spring_boot}")
+
+         implementation libraries.aspectjweaver,
+                        libraries.spring_boot_starter_web
+
+     testImplementation libraries.spring_boot_starter_test
+     testImplementation libraries.roll_test
+}
+
+configurations.all {
+    // 强制所有依赖使用相同版本的 Spring Framework
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def req = details.requested
+        if (req.group == 'org.springframework') {
+            details.useVersion "5.0.13.RELEASE"
+        } else if (req.group == 'org.springframework.boot') {
+            details.useVersion "2.0.9.RELEASE"
+        }
+    }
+}
